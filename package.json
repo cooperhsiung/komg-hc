@@ -1,0 +1,27 @@
+{
+  "name": "komg-hc",
+  "version": "1.0.0",
+  "description": "komg health check on target client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cooperhsiung/komg-hc.git"
+  },
+  "keywords": [
+    "komg",
+    "health",
+    "check"
+  ],
+  "author": "Cooper Hsiung",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cooperhsiung/komg-hc/issues"
+  },
+  "homepage": "https://github.com/cooperhsiung/komg-hc#readme",
+  "dependencies": {
+    "faye": "^1.2.4"
+  }
+}
