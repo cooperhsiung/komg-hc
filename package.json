@@ -1,6 +1,6 @@
 {
   "name": "komg-hc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "komg health check on target client",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/cooperhsiung/komg-hc#readme",
   "dependencies": {
-    "faye": "^1.2.4",
-    "unirest": "^0.5.1"
+    "redis": "^2.8.0"
   }
 }

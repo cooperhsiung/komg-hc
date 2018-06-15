@@ -1,27 +1,19 @@
 /**
- * Created by Cooper on 2018/06/13.
+ * Created by Cooper on 2018/6/14.
  */
 const os = require('os');
-const faye = require('faye');
+const redis = require('redis');
 const nifs = Object.values(os.networkInterfaces());
 const address = nifs.reduce((s, v) => s.concat(v), []).find(e => e.family === 'IPv4' && !e.internal).address;
 console.log(address);
 
-const nodes = ['http://localhost:2350'];
-
-const clients = [];
-
 class Checker {
-  constructor(server) {
-    this.clients = [];
-    this.server = null;
+  constructor() {
+    this.publisher = null;
   }
 
-  reserve(nodes) {
-    nodes.forEach(node => {
-      let client = new faye.Client((node.includes('http') ? node : 'http://' + node) + '/admin/faye');
-      this.clients.push(client);
-    });
+  reserve(url) {
+    this.publisher = redis.createClient(url);
     return this;
   }
 
@@ -31,32 +23,39 @@ class Checker {
     if (!port) {
       console.error('komg health check start failed');
     } else {
-      this.clients.forEach(client => {
-        if (client) {
-          client.publish('/up', `${address}:${port}`);
-        }
-      });
+      console.log('healthy~~');
+      this.publisher.publish('komg/up', JSON.stringify({ server: address + ':' + port }));
     }
   }
 
   down() {
+    console.log('exit~~');
     let port = this.server.address().port;
     if (!port) {
       console.error('komg health check start failed');
     } else {
-      clients.forEach(client => {
-        if (client) {
-          client.publish('/down', `${address}:${port}`);
-        }
+      this.publisher.publish('komg/down', JSON.stringify({ server: address + ':' + port }), () => {
+        process.exit();
       });
     }
   }
 }
 
-let checker = new Checker();
+const checker = new Checker();
 
-process.on('beforeExit', () => {
-  checker.down();
-});
-// hc.reserve(['localhost:2350']).check(server)
+[
+  'SIGHUP',
+  'SIGINT',
+  'SIGQUIT',
+  'SIGILL',
+  'SIGTRAP',
+  'SIGABRT',
+  'SIGBUS',
+  'SIGFPE',
+  'SIGUSR1',
+  'SIGSEGV',
+  'SIGUSR2',
+  'SIGTERM'
+].forEach(sig => process.on(sig, () => checker.down()));
+
 module.exports = checker;
