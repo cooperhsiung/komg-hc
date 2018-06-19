@@ -12,8 +12,23 @@ class Checker {
     this.publisher = null;
   }
 
-  reserve(url) {
-    this.publisher = redis.createClient(url);
+  reserve(url = 'redis://127.0.0.1:6379/0') {
+    this.publisher = redis.createClient(url, {
+      retry_strategy: function(options) {
+        if (options.error && options.error.code === 'ECONNREFUSED') {
+          console.error('The server refused the connection');
+          return undefined;
+        }
+        if (options.total_retry_time > 1000 * 60 * 60) {
+          console.error('Retry time exhausted');
+          return undefined;
+        }
+        if (options.attempt > 10) {
+          return undefined;
+        }
+        return Math.min(options.attempt * 100, 3000);
+      }
+    });
     return this;
   }
 
