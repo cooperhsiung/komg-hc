@@ -17,14 +17,14 @@ class Checker {
       retry_strategy: function(options) {
         if (options.error && options.error.code === 'ECONNREFUSED') {
           console.error('The server refused the connection');
-          return undefined;
+          return;
         }
         if (options.total_retry_time > 1000 * 60 * 60) {
           console.error('Retry time exhausted');
-          return undefined;
+          return;
         }
         if (options.attempt > 10) {
-          return undefined;
+          return;
         }
         return Math.min(options.attempt * 100, 3000);
       }
@@ -49,9 +49,7 @@ class Checker {
     if (!port) {
       console.error('komg health check start failed');
     } else {
-      this.publisher.publish('komg/down', JSON.stringify({ server: address + ':' + port }), () => {
-        process.exit();
-      });
+      this.publisher.publish('komg/down', JSON.stringify({ server: address + ':' + port }), process.exit);
     }
   }
 }
@@ -71,6 +69,7 @@ const checker = new Checker();
   'SIGSEGV',
   'SIGUSR2',
   'SIGTERM'
-].forEach(sig => process.on(sig, () => checker.down()));
+].forEach(sig => process.on(sig, checker.down.bind(checker)));
+// on windows, try pm2-interface
 
 module.exports = checker;

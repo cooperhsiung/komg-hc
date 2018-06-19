@@ -1,6 +1,6 @@
 {
   "name": "komg-hc",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "komg health check on target client",
   "main": "index.js",
   "scripts": {
