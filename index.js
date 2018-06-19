@@ -5,7 +5,7 @@ const os = require('os');
 const redis = require('redis');
 const nifs = Object.values(os.networkInterfaces());
 const address = nifs.reduce((s, v) => s.concat(v), []).find(e => e.family === 'IPv4' && !e.internal).address;
-console.log(address);
+// console.log(address);
 
 class Checker {
   constructor() {
@@ -23,13 +23,13 @@ class Checker {
     if (!port) {
       console.error('komg health check start failed');
     } else {
-      console.log('healthy~~');
+      console.log(address, 'healthy~~');
       this.publisher.publish('komg/up', JSON.stringify({ server: address + ':' + port }));
     }
   }
 
   down() {
-    console.log('exit~~');
+    console.log(address, 'exit~~');
     let port = this.server.address().port;
     if (!port) {
       console.error('komg health check start failed');
